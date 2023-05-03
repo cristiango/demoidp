@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotLiquid" Version="2.2.692" />
+    <PackageReference Include="Duende.IdentityServer" Version="6.*" />
+    <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.*" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.*" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="key.rsa" />
+    <EmbeddedResource Include="key.rsa" />
+    <None Remove="Home.liquid" />
+    <EmbeddedResource Include="Home.liquid" />
+    <None Remove="Login.liquid" />
+    <EmbeddedResource Include="Login.liquid" />
+  </ItemGroup>
+
+</Project>

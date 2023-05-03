@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Test Identity Provider</title>
+        <link rel="stylesheet" type="text/css" href="../static/css/interfacey.min.css">
+    </head>
+    <body>
+        <div class="login-page" style="padding-top: 10%">
+            <div class="row" style="margin: 0">
+                <div class="col-sm-5" style="margin: auto;float: none;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Test Identity Provider</h3>
+                        </div>
+                        <div class="panel-body" style="color: #333333">
+                            <form method="post" action="authenticate/login">
+                                <input name="ReturnUrl" type="hidden" value="{{ ReturnUrl }}" />
+                                <fieldset>
+                                    <div class="form-group">
+                                        <input name="username" class="form-control" placeholder="Username" id="Username" autofocus>
+                                    </div>
+                                    <div class="form-group">
+                                        <input name="password" type="password" class="form-control" placeholder="Password" id="Password" autocomplete="off">
+                                    </div>
+									<div class="form-group">
+                                        <input name="roles" type="text" class="form-control" placeholder="Roles" id="Roles" autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" name="button" value="login">Login</button>
+                                    </div>
+                            
+                                    {% if ValidationErrors.size > 0 %}
+                                        <div class="alert alert-danger">
+                                            {% for error in ValidationErrors %}
+                                              <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
