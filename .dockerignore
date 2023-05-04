@@ -1,0 +1,41 @@
+# Ignore .NET artifacts
+**/*.pdb
+**/*.obj
+**/*.dll
+**/*.exe
+**/*.cache
+**/*.log
+
+# Ignore user-specific files
+**/.vs
+**/.vscode
+**/.idea
+**/.suo
+**/.user
+**/.history
+
+# Ignore build artifacts
+**/bin
+**/obj
+**/out
+**/artifacts
+
+# Ignore package management files
+**/packages
+**/node_modules
+
+# Ignore source control files
+**/.git
+**/.gitignore
+**/.svn
+**/.hg
+
+# Ignore build scripts
+**/*.ps1
+**/*.sh
+**/*.cmd
+**/*.bat
+**/*.yml
+**/*.yaml
+
+# Ignore any other files or directories that you don't need to include in the image
