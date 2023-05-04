@@ -58,7 +58,7 @@ public class DemoIdP
         {
             AccountName = storageAccount.Name,
             ResourceGroupName = resourceGroup.Name,
-            PublicAccess = PublicAccess.Blob
+            PublicAccess = PublicAccess.None
         });
 
 
@@ -67,12 +67,13 @@ public class DemoIdP
             AccountName = storageAccount.Name,
             ContainerName = blobContainer.Name,
             ResourceGroupName = resourceGroup.Name,
-            BlobName = "demoidp.zip",
             Type = BlobType.Block,
             Source = new FileAsset(Path.Combine(GetRootDirectory(), "artifacts", "demoidp.zip"))
         });
 
-        var webApp = new Pulumi.AzureNative.Web.WebApp("webapp", new Pulumi.AzureNative.Web.WebAppArgs
+        var codeBlockUrl = SignedBlobReadUrl(blob, blobContainer, storageAccount, resourceGroup);
+
+        var webApp = new WebApp("webapp", new Pulumi.AzureNative.Web.WebAppArgs
         {
             Kind = "app,linux",
             ResourceGroupName = resourceGroup.Name,
@@ -87,7 +88,7 @@ public class DemoIdP
                     new NameValuePairArgs
                     {
                         Name = "WEBSITE_RUN_FROM_PACKAGE",
-                        Value = blob.Url.Apply(url => url)
+                        Value = codeBlockUrl
                     }
                 },
                 HealthCheckPath = "/health",
