@@ -10,6 +10,7 @@
     <PackageReference Include="DotLiquid" Version="2.2.692" />
     <PackageReference Include="Duende.IdentityServer" Version="6.*" />
     <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.*" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
   </ItemGroup>

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using Pulumi;
+using Pulumi.AzureNative.Insights;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Storage;
 using Pulumi.AzureNative.Storage.Inputs;
 using Pulumi.AzureNative.Web;
 using Pulumi.AzureNative.Web.Inputs;
+using Kind = Pulumi.AzureNative.Storage.Kind;
 
 namespace infra;
 
@@ -23,8 +25,8 @@ public class DemoIdP
         });
 
         //AppService plan
-        var appServicePlan = new Pulumi.AzureNative.Web.AppServicePlan("servicePlan",
-            new Pulumi.AzureNative.Web.AppServicePlanArgs
+        var appServicePlan = new AppServicePlan("servicePlan",
+            new AppServicePlanArgs
             {
                 ResourceGroupName = resourceGroup.Name,
                 Kind = "linux",
@@ -73,7 +75,14 @@ public class DemoIdP
 
         var codeBlockUrl = SignedBlobReadUrl(blob, blobContainer, storageAccount, resourceGroup);
 
-        var webApp = new WebApp("webapp", new Pulumi.AzureNative.Web.WebAppArgs
+        var appInsights = new Component("appInsights", new ComponentArgs
+        {
+            ApplicationType = ApplicationType.Web,
+            Kind = "web",
+            ResourceGroupName = resourceGroup.Name
+        });
+        
+        var webApp = new WebApp("webapp", new WebAppArgs
         {
             Kind = "app,linux",
             ResourceGroupName = resourceGroup.Name,
@@ -89,7 +98,12 @@ public class DemoIdP
                     {
                         Name = "WEBSITE_RUN_FROM_PACKAGE",
                         Value = codeBlockUrl
-                    }
+                    },
+                    new NameValuePairArgs
+                    {
+                        Name = "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                        Value = appInsights.ConnectionString,
+                    },
                 },
                 HealthCheckPath = "/health",
             },
