@@ -7,6 +7,7 @@ using Pulumi.AzureNative.Storage;
 using Pulumi.AzureNative.Storage.Inputs;
 using Pulumi.AzureNative.Web;
 using Pulumi.AzureNative.Web.Inputs;
+using Pulumi.SyncedFolder;
 using Kind = Pulumi.AzureNative.Storage.Kind;
 
 namespace infra;
@@ -54,9 +55,28 @@ public class DemoIdP
                 }
             });
 
+        //Create front-end static content container
+        var staticContentContainer = new BlobContainer("static-content", new BlobContainerArgs
+        {
+            AccountName = storageAccount.Name,
+            ResourceGroupName = resourceGroup.Name,
+            PublicAccess = PublicAccess.Blob
+        });
+
+        var staticContentFolder = "../artifacts/frontend";
+        Log.Info($"Upload all files from : {staticContentFolder}");
+        var staticContentFolderSync = new AzureBlobFolder("static-content-sync", new AzureBlobFolderArgs
+        {
+            ResourceGroupName = resourceGroup.Name,
+            ContainerName = staticContentContainer.Name,
+            StorageAccountName = storageAccount.Name,
+            Path = staticContentFolder,
+            ManagedObjects = true
+        });
+
 
         // Create a container in the storage account for the artifacts
-        var blobContainer = new BlobContainer("container", new BlobContainerArgs
+        var backendArtifactsContainer = new BlobContainer("backend-artifacts", new BlobContainerArgs
         {
             AccountName = storageAccount.Name,
             ResourceGroupName = resourceGroup.Name,
@@ -64,16 +84,16 @@ public class DemoIdP
         });
 
 
-        var blob = new Blob("artifacts", new BlobArgs
+        var backendZipBlob = new Blob("artifacts", new BlobArgs
         {
             AccountName = storageAccount.Name,
-            ContainerName = blobContainer.Name,
+            ContainerName = backendArtifactsContainer.Name,
             ResourceGroupName = resourceGroup.Name,
             Type = BlobType.Block,
             Source = new FileAsset(Path.Combine(GetRootDirectory(), "artifacts", "demoidp.zip"))
         });
 
-        var codeBlockUrl = SignedBlobReadUrl(blob, blobContainer, storageAccount, resourceGroup);
+        var codeBlockUrl = SignedBlobReadUrl(backendZipBlob, backendArtifactsContainer, storageAccount, resourceGroup);
 
         var appInsights = new Component("appInsights", new ComponentArgs
         {
@@ -81,7 +101,7 @@ public class DemoIdP
             Kind = "web",
             ResourceGroupName = resourceGroup.Name
         });
-        
+
         var webApp = new WebApp("webapp", new WebAppArgs
         {
             Kind = "app,linux",
@@ -104,6 +124,11 @@ public class DemoIdP
                         Name = "APPLICATIONINSIGHTS_CONNECTION_STRING",
                         Value = appInsights.ConnectionString,
                     },
+                    new NameValuePairArgs
+                    {
+                        Name = "DIDP_CdnUrl",
+                        Value = Output.Format($"https://{storageAccount.Name}.blob.core.windows.net/{staticContentContainer.Name}")
+                    }
                 },
                 HealthCheckPath = "/health",
             },
@@ -115,7 +140,6 @@ public class DemoIdP
 
         WebAppUrl = webApp.DefaultHostName.Apply(url => $"https://{url}/");
         ResourceGroup = resourceGroup.Name;
-        
     }
 
     static Output<string> SignedBlobReadUrl(Blob blob, BlobContainer container, StorageAccount account,
@@ -143,6 +167,7 @@ public class DemoIdP
 
     [Output("webAppUrl")] public Output<string> WebAppUrl { get; set; }
     [Output("resouceGroup")] public Output<string> ResourceGroup { get; set; }
+
     static string GetRootDirectory()
     {
         // There are two places where this is executed from

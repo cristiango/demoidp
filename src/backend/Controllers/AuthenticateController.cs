@@ -4,6 +4,7 @@ using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Services;
 using IdentityModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace demoidp.Controllers;
 
@@ -13,18 +14,21 @@ public class AuthenticateController : ControllerBase
 {
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IEventService _events;
+    private readonly Settings _settings;
 
-    public AuthenticateController(IIdentityServerInteractionService interaction, IEventService events)
+    public AuthenticateController(IIdentityServerInteractionService interaction, IEventService events, IOptions<Settings> settingsSnapshot)
     {
         _interaction = interaction;
         _events = events;
+        _settings = settingsSnapshot.Value;
     }
 
     [HttpGet]
     public IActionResult Get(string? returnUrl) =>
         LiquidContentResult.Get(DotLiquidTemplates.Login, new
         {
-            ReturnUrl = returnUrl
+            ReturnUrl = returnUrl,
+            CdnUrl = _settings.CdnUrl.TrimEnd('/')
         });
 
     [HttpPost("login")]

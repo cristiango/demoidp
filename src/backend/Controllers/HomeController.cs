@@ -1,6 +1,7 @@
 ﻿using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace demoidp.Controllers;
 
@@ -9,6 +10,12 @@ namespace demoidp.Controllers;
 [Route("/")]
 public class HomeController : ControllerBase
 {
+    private readonly Settings _settings;
+
+    public HomeController(IOptionsSnapshot<Settings> settingsOptions)
+    {
+        _settings = settingsOptions.Value;
+    }
     [HttpGet]
     public IActionResult Index()
     {
@@ -19,7 +26,8 @@ public class HomeController : ControllerBase
 
         return LiquidContentResult.Get(DotLiquidTemplates.Home, new
         {
-            Username = User.GetDisplayName()
+            Username = User.GetDisplayName(),
+            CdnUrl = _settings.CdnUrl.TrimEnd('/')
         });
     }
 }

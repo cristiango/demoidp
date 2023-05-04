@@ -1,16 +1,18 @@
+using demoidp.Controllers;
 using demoidp.IdentityServer;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Configuration.AddEnvironmentVariables("DIDP_");
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.Configure<Settings>(builder.Configuration);
 
 builder.Services.AddIdentityServer(options =>
     {
