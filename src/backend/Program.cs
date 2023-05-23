@@ -5,6 +5,11 @@ using Duende.IdentityServer.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables("DIDP_");
+
+builder.Logging.ClearProviders();
+builder.Logging.AddDebug();
+builder.Logging.AddConsole();
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
@@ -26,7 +31,7 @@ builder.Services.AddIdentityServer(options =>
     .AddInMemoryApiResources(IdSrvConfig.GetApis())
     .AddInMemoryIdentityResources(IdSrvConfig.GetIdentityResources())
     .AddInMemoryClients(IdSrvConfig.GetClients())
-    //.AddEmbeddedSigningCredential()
+    .AddProfileService<DemoProfileService>()
     .AddDeveloperSigningCredential(filename: Path.Combine(Path.GetTempPath(), "tempkey.jwk"));
 
 builder.Services.AddTransient<ICorsPolicyService, DemoCorsPolicyService>();
